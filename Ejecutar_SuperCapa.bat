@@ -23,6 +23,8 @@ pip show SpeechRecognition >nul 2>&1 || pip install SpeechRecognition --quiet
 pip show keyboard >nul 2>&1 || pip install keyboard --quiet
 pip show pyaudio >nul 2>&1 || pip install pyaudio --quiet
 pip show pyperclip >nul 2>&1 || pip install pyperclip --quiet
+pip show pycaw >nul 2>&1 || pip install pycaw --quiet
+pip show comtypes >nul 2>&1 || pip install comtypes --quiet
 
 echo.
 echo Todas las librerias OK.

@@ -191,6 +191,34 @@ INTENTS = {
         "mas despacio", "más despacio", "menos velocidad", "reduce velocidad",
         "decelera", "paso pequeño", "paso lento",
     ],
+    # Control de volumen
+    "VOL_UP": [
+        "volumen más", "volumen mas", "sube el volumen", "sube volumen",
+        "más volumen", "mas volumen", "aumenta el volumen", "aumenta volumen",
+        "sonido más", "sonido mas", "sube el sonido", "más sonido", "mas sonido",
+        "más", "mas",
+    ],
+    "VOL_DOWN": [
+        "volumen menos", "baja el volumen", "baja volumen",
+        "menos volumen", "reduce el volumen", "reduce volumen",
+        "sonido menos", "baja el sonido", "menos sonido",
+        "menos",
+    ],
+    "VOL_MUTE": [
+        "silencio", "mutear", "mute", "sin sonido", "quita el sonido",
+        "quita el volumen", "apaga el sonido", "apaga el volumen",
+        "silenciar",
+    ],
+    "VOL_MAX": [
+        "volumen máximo", "volumen maximo", "volumen al máximo",
+        "volumen al maximo", "sonido máximo", "sonido al máximo",
+        "sube al máximo", "al máximo", "al maximo", "volumen total",
+        "al cien por cien", "subir al máximo",
+    ],
+    "VOL_MODE": [
+        "volumen", "sonido", "control de volumen", "ajustar volumen",
+        "ajustar sonido",
+    ],
 }
 
 INTENT_PRIORITY = [
@@ -204,6 +232,7 @@ INTENT_PRIORITY = [
     "MOUSE_FASTER", "MOUSE_SLOWER",
     "MOUSE_UP", "MOUSE_DOWN", "MOUSE_LEFT", "MOUSE_RIGHT",
     "DOUBLE_CLICK", "RIGHT_CLICK", "LEFT_CLICK",
+    "VOL_MUTE", "VOL_MAX", "VOL_UP", "VOL_DOWN", "VOL_MODE",
     "START_DICTATION",
 ]
 
@@ -619,6 +648,114 @@ class VoiceMouseController:
 
 
 
+
+# =====================================================================
+#  CONTROL DE VOLUMEN
+# =====================================================================
+class VolumeController:
+    """
+    Controla el volumen del sistema usando pycaw (Windows Core Audio).
+    Si pycaw no esta disponible, cae a teclado multimedia como respaldo.
+
+    Comandos:
+      up(step)   sube el volumen (step = 0..1, defecto 0.10 = 10%)
+      down(step) baja el volumen
+      mute()     silencia / dessilencia
+      maximum()  sube al 100%
+    """
+
+    # Cantidad de pulsaciones de tecla multimedia cuando no hay pycaw
+    _KEY_STEP = 5
+
+    def __init__(self):
+        self._iface = None          # interfaz pycaw IAudioEndpointVolume
+        self._volume_mode = False   # True cuando el usuario esta en modo volumen
+        self._try_init_pycaw()
+
+    def _try_init_pycaw(self):
+        try:
+            from ctypes import cast, POINTER
+            from comtypes import CLSCTX_ALL
+            from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
+            devices = AudioUtilities.GetSpeakers()
+            interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+            self._iface = cast(interface, POINTER(IAudioEndpointVolume))
+            print("[volumen] pycaw disponible — control preciso activado")
+        except Exception as e:
+            print(f"[volumen] pycaw no disponible ({e}), usando teclas multimedia")
+
+    # ---- helpers internos ----
+    def _get_vol(self) -> float:
+        """Devuelve volumen actual 0.0 – 1.0"""
+        if self._iface:
+            return self._iface.GetMasterVolumeLevelScalar()
+        return 0.5  # desconocido sin pycaw
+
+    def _set_vol(self, level: float):
+        """Establece volumen 0.0 – 1.0"""
+        level = max(0.0, min(1.0, level))
+        if self._iface:
+            self._iface.SetMasterVolumeLevelScalar(level, None)
+        else:
+            # Fallback: teclas multimedia
+            current = self._get_vol()
+            diff = level - current
+            key = "volumeup" if diff > 0 else "volumedown"
+            presses = max(1, round(abs(diff) * 50))  # ~50 pasos = rango completo
+            for _ in range(min(presses, 50)):
+                pyautogui.press(key)
+                time.sleep(0.01)
+
+    # ---- API publica ----
+    def up(self, step: float = 0.10):
+        if self._iface:
+            new = min(1.0, self._get_vol() + step)
+            self._set_vol(new)
+            print(f"[volumen] {int(new * 100)}%")
+        else:
+            for _ in range(self._KEY_STEP):
+                pyautogui.press("volumeup")
+                time.sleep(0.02)
+
+    def down(self, step: float = 0.10):
+        if self._iface:
+            new = max(0.0, self._get_vol() - step)
+            self._set_vol(new)
+            print(f"[volumen] {int(new * 100)}%")
+        else:
+            for _ in range(self._KEY_STEP):
+                pyautogui.press("volumedown")
+                time.sleep(0.02)
+
+    def mute(self):
+        if self._iface:
+            is_muted = self._iface.GetMute()
+            self._iface.SetMute(not is_muted, None)
+            estado = "silenciado" if not is_muted else "con sonido"
+            print(f"[volumen] {estado}")
+        else:
+            pyautogui.press("volumemute")
+
+    def maximum(self):
+        self._set_vol(1.0)
+        print("[volumen] maximo 100%")
+
+    @property
+    def volume_mode(self):
+        return self._volume_mode
+
+    def enter_mode(self):
+        self._volume_mode = True
+        print("[volumen] modo volumen activado — di 'más', 'menos', 'silencio', 'máximo'")
+
+    def exit_mode(self):
+        self._volume_mode = False
+        print("[volumen] modo volumen desactivado")
+
+
+# =====================================================================
+#  OVERLAY PRINCIPAL (rejilla pantalla completa)
+# =====================================================================
 class GridOverlay:
     def __init__(self, master):
         self.win = tk.Toplevel(master)
@@ -1049,6 +1186,7 @@ class SuperCapa:
         self.hud = DictationHUD(self.root)
         self.dictation = DirectDictation(self.hud)
         self.mouse_ctrl = VoiceMouseController()
+        self.volume_ctrl = VolumeController()
 
         self.keyboard_open = False
         self.command_queue = queue.Queue()
@@ -1143,30 +1281,61 @@ class SuperCapa:
     # ----- voz -----
     def _voice_loop(self):
         r = sr.Recognizer()
-        r.pause_threshold = 0.6
+
+        # --- Parametros anti-ruido ---
+        # dynamic_energy_threshold: el umbral se adapta continuamente
+        # al nivel de ruido del entorno
+        r.dynamic_energy_threshold = True
+        r.dynamic_energy_adjustment_damping = 0.15   # reaccion mas lenta = mas estable
+        r.dynamic_energy_ratio = 1.8                 # voz debe ser 1.8x mas alta que ruido
+        r.pause_threshold = 0.7        # silencio para considerar fin de frase
+        r.non_speaking_duration = 0.4  # margen tras el silencio
+        r.phrase_threshold = 0.3       # minimo de audio para considerar frase valida
+        r.operation_timeout = None     # sin timeout en reconocimiento
+
         try:
             mic = sr.Microphone()
         except Exception as e:
             print(f"[ERROR] microfono: {e}"); return
+
+        # Calibracion inicial larga para capturar bien el ruido de fondo
+        print("Calibrando microfono (3 segundos, mantener silencio)...")
         with mic as src:
-            print("Calibrando microfono...")
-            r.adjust_for_ambient_noise(src, duration=1.0)
-            print("Escuchando. Di 'TEXTO' para dictar, 'QUITAR TEXTO' para cerrar.")
+            r.adjust_for_ambient_noise(src, duration=3.0)
+        print(f"Umbral de energia inicial: {int(r.energy_threshold)}")
+        print("Escuchando. La voz debe ser notablemente mas alta que el ruido.")
+
+        # Recalibracion periodica cada 60 frases para adaptarse a cambios
+        # (ej: entrar en una habitacion mas ruidosa)
+        phrase_count = 0
+        RECALIBRATE_EVERY = 60
 
         while self.listening:
             try:
                 with mic as src:
-                    audio = r.listen(src, timeout=3, phrase_time_limit=8)
+                    audio = r.listen(src, timeout=4, phrase_time_limit=10)
             except sr.WaitTimeoutError:
+                # Aprovechar el timeout para recalibrar si hace falta
+                phrase_count += 1
+                if phrase_count >= RECALIBRATE_EVERY:
+                    phrase_count = 0
+                    try:
+                        with mic as src:
+                            r.adjust_for_ambient_noise(src, duration=0.5)
+                        print(f"[recalibracion] umbral -> {int(r.energy_threshold)}")
+                    except Exception:
+                        pass
                 continue
             except Exception as e:
                 print(f"[aviso] escuchando: {e}")
                 time.sleep(0.3)
                 continue
+
             try:
                 text = r.recognize_google(audio, language=LANGUAGE).lower().strip()
                 print(f"[oido] {text!r}")
                 self.command_queue.put(text)
+                phrase_count += 1
             except sr.UnknownValueError:
                 pass
             except sr.RequestError as e:
@@ -1189,6 +1358,23 @@ class SuperCapa:
             self.dictation.type_phrase(text)
             return
 
+        # --- Modo volumen activo: "más" / "menos" / "silencio" / "máximo" ---
+        if self.volume_ctrl.volume_mode:
+            intent = classify_intent(text)
+            if intent == "VOL_UP":
+                self.volume_ctrl.up(); return
+            if intent == "VOL_DOWN":
+                self.volume_ctrl.down(); return
+            if intent == "VOL_MUTE":
+                self.volume_ctrl.mute(); return
+            if intent == "VOL_MAX":
+                self.volume_ctrl.maximum(); return
+            if intent == "QUIT":
+                self.quit(); return
+            # Cualquier otra cosa sale del modo volumen y procesa el comando
+            self.volume_ctrl.exit_mode()
+            # (continua al modo normal abajo)
+
         # --- Modo normal ---
         coord = parse_coordinate(text)
         if coord:
@@ -1210,6 +1396,13 @@ class SuperCapa:
         if intent == "HIDE_GRID":      self.grid.hide(); return
         if intent == "START_DICTATION": self.start_dictation(); return
         if intent == "STOP_DICTATION":  self.stop_dictation(); return
+
+        # Volumen directo (sin entrar en modo)
+        if intent == "VOL_MUTE":  self.volume_ctrl.mute(); return
+        if intent == "VOL_MAX":   self.volume_ctrl.maximum(); return
+        if intent == "VOL_UP":    self.volume_ctrl.up(); return
+        if intent == "VOL_DOWN":  self.volume_ctrl.down(); return
+        if intent == "VOL_MODE":  self.volume_ctrl.enter_mode(); return
 
         # Control direccional del raton
         if intent == "MOUSE_UP":
@@ -1279,7 +1472,14 @@ def main():
     print("  'doble clic'     -> doble clic en posicion actual")
     print("  'clic derecho'   -> menu contextual en posicion actual")
     print()
-    print("Teclas:  F7=moto   F8=rejilla   F9=salir   F10=teclado")
+    print("Voz - CONTROL DE VOLUMEN:")
+    print("  'volumen' / 'sonido'   -> entra en modo volumen")
+    print("  'más'                  -> sube 10%")
+    print("  'menos'                -> baja 10%")
+    print("  'silencio'             -> mutear/desmutear")
+    print("  'volumen máximo'       -> subir al 100%")
+    print("  (También funcionan directo: 'sube el volumen', 'silencio'...)")
+    print()
     print("=" * 62)
     SuperCapa().run()
 
