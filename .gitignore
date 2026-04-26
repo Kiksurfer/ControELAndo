@@ -1,0 +1,32 @@
+# Archivos generados al compilar
+build/
+dist/
+*.spec
+__pycache__/
+*.pyc
+*.pyo
+
+# Logs
+*.log
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Entornos virtuales de Python
+venv/
+env/
+.venv/
+.env/
+
+# Ejecutables compilados localmente (no queremos subirlos al repo,
+# GitHub Actions los compila por nosotros)
+*.exe
