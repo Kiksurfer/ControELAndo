@@ -1,0 +1,76 @@
+tapunto-voz
+Copyright (c) [AÑO] Enrique García Prats, Jorge García Prats, Alicia Prats Martínez.
+
+Este producto incorpora software de terceros. A continuación se listan
+las dependencias y sus respectivas licencias. El cumplimiento de cada
+licencia es obligatorio para cualquier redistribución.
+
+================================================================
+DEPENDENCIAS DIRECTAS
+================================================================
+
+Vosk Speech Recognition Toolkit
+  Licencia: Apache License 2.0
+  Web: https://alphacephei.com/vosk/
+  Notas: el modelo «vosk-model-small-es-0.42» se distribuye bajo
+  Apache License 2.0 y se descarga durante la compilación.
+
+sounddevice
+  Licencia: MIT License
+  Web: https://python-sounddevice.readthedocs.io/
+
+NumPy
+  Licencia: BSD 3-Clause License
+  Web: https://numpy.org/
+
+PyAutoGUI
+  Licencia: BSD 3-Clause License
+  Web: https://pyautogui.readthedocs.io/
+
+keyboard
+  Licencia: MIT License
+  Web: https://github.com/boppreh/keyboard
+
+pyperclip
+  Licencia: BSD 3-Clause License
+  Web: https://github.com/asweigart/pyperclip
+
+pywin32
+  Licencia: PSF (Python Software Foundation) License
+  Web: https://github.com/mhammond/pywin32
+
+pycaw
+  Licencia: MIT License
+  Web: https://github.com/AndreMiras/pycaw
+
+comtypes
+  Licencia: MIT License
+  Web: https://github.com/enthought/comtypes
+
+cryptography
+  Licencia: Apache License 2.0 / BSD 3-Clause License (dual)
+  Web: https://cryptography.io/
+
+PyInstaller
+  Licencia: GPL v2 con excepción explícita para empaquetar
+            programas con cualquier licencia.
+  Web: https://pyinstaller.org/
+  Notas: la excepción permite distribuir programas empaquetados
+  con tapunto-voz bajo cualquier licencia, incluida la nuestra.
+
+================================================================
+COMPATIBILIDAD DE LICENCIAS
+================================================================
+
+Todas las dependencias listadas son compatibles entre sí y con
+licencias permisivas y copyleft. La licencia bajo la que se
+distribuye tapunto-voz se indica en el archivo LICENSE.
+
+================================================================
+TEXTOS DE LAS LICENCIAS
+================================================================
+
+Los textos completos de cada licencia están disponibles en el
+sitio oficial de cada proyecto. Al redistribuir tapunto-voz se
+recomienda incluir copia íntegra de cada texto en este mismo
+archivo o en una carpeta «licenses/» del paquete.
