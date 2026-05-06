@@ -1,0 +1,171 @@
+name: Construir y firmar tapunto-voz.exe
+
+# Se activa al crear un tag (v1.0, v2.0...) o manualmente desde la web de GitHub
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version_notes:
+        description: 'Notas de la versión (opcional)'
+        required: false
+        default: 'Nueva versión de tapunto-voz'
+
+permissions:
+  contents: write          # necesario para crear releases
+  id-token: write          # necesario para SignPath OIDC
+
+jobs:
+  build:
+    name: Compilar, firmar y publicar
+    runs-on: windows-latest
+
+    steps:
+      # 1. Clonar el repositorio
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      # 2. Instalar Python 3.11
+      - name: Instalar Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      # 3. Instalar dependencias con verificación de integridad
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 4. Descargar el modelo de reconocimiento de voz (Vosk, español, ~50 MB)
+      #    Modelo local: el audio del usuario NO sale de su ordenador.
+      - name: Descargar modelo Vosk (español)
+        shell: pwsh
+        run: |
+          $url  = "https://alphacephei.com/vosk/models/vosk-model-small-es-0.42.zip"
+          $zip  = "vosk-model.zip"
+          $dest = "model"
+          Invoke-WebRequest -Uri $url -OutFile $zip -UseBasicParsing
+          Expand-Archive -Path $zip -DestinationPath . -Force
+          Rename-Item -Path "vosk-model-small-es-0.42" -NewName $dest
+          Remove-Item $zip
+          Write-Host "Modelo Vosk descargado en .\model\"
+
+      # 5. Verificar sintaxis de los archivos Python
+      - name: Verificar sintaxis del código fuente
+        run: |
+          python -c "import ast; ast.parse(open('supercapa.py','r',encoding='utf-8').read()); print('supercapa.py OK')"
+          python -c "import ast; ast.parse(open('consent_dialog.py','r',encoding='utf-8').read()); print('consent_dialog.py OK')"
+          python -c "import ast; ast.parse(open('voice_engine.py','r',encoding='utf-8').read()); print('voice_engine.py OK')"
+          python -c "import ast; ast.parse(open('secure_config.py','r',encoding='utf-8').read()); print('secure_config.py OK')"
+
+      # 6. Generar el .exe con PyInstaller (modelo incluido como recurso)
+      - name: Generar tapunto-voz.exe
+        run: |
+          pyinstaller `
+            --onefile `
+            --noconsole `
+            --name "tapunto-voz" `
+            --add-data "model;model" `
+            --hidden-import=vosk `
+            --hidden-import=sounddevice `
+            --hidden-import=numpy `
+            --hidden-import=pyperclip `
+            --hidden-import=keyboard `
+            --hidden-import=win32gui `
+            --hidden-import=win32con `
+            --hidden-import=win32api `
+            --hidden-import=pycaw `
+            --hidden-import=comtypes `
+            --hidden-import=comtypes.client `
+            --hidden-import=cryptography `
+            --hidden-import=tkinter `
+            supercapa.py
+
+      # 7. Calcular y guardar el hash SHA-256 del binario
+      - name: Calcular SHA-256 del ejecutable
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash -Algorithm SHA256 dist\tapunto-voz.exe).Hash.ToLower()
+          $line = "$hash  tapunto-voz.exe"
+          Set-Content -Path "dist\tapunto-voz.exe.sha256" -Value $line -NoNewline
+          Write-Host "SHA-256: $hash"
+
+      # 8. Firmar el ejecutable con SignPath (gratis para OSS)
+      #
+      #    REQUISITO PREVIO: registrar el proyecto en https://signpath.io/oss
+      #    y configurar los siguientes secretos en GitHub:
+      #      - SIGNPATH_ORGANIZATION_ID
+      #      - SIGNPATH_PROJECT_SLUG
+      #      - SIGNPATH_SIGNING_POLICY_SLUG
+      #
+      #    Mientras la cuenta SignPath no esté aprobada, este paso se omite
+      #    automáticamente: el binario se publica sin firma pero con SHA-256.
+      - name: Firmar el ejecutable (SignPath)
+        if: env.SIGNPATH_ORGANIZATION_ID != ''
+        uses: signpath/github-action-submit-signing-request@v1
+        env:
+          SIGNPATH_ORGANIZATION_ID: ${{ secrets.SIGNPATH_ORGANIZATION_ID }}
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ secrets.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ secrets.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ secrets.SIGNPATH_SIGNING_POLICY_SLUG }}
+          github-artifact-id: ${{ steps.upload-unsigned.outputs.artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: 'dist-signed'
+
+      # 9. Subir el ejecutable como artefacto descargable (90 días)
+      - name: Subir artefacto sin firmar
+        id: upload-unsigned
+        uses: actions/upload-artifact@v4
+        with:
+          name: tapunto-voz-unsigned
+          path: dist/tapunto-voz.exe
+          retention-days: 90
+
+      # 10. Publicar en GitHub Releases (solo cuando hay un tag v*)
+      - name: Publicar en GitHub Releases
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/tapunto-voz.exe
+            dist/tapunto-voz.exe.sha256
+          name: "tapunto-voz ${{ github.ref_name }}"
+          body: |
+            ## tapunto-voz ${{ github.ref_name }}
+
+            **Control del ordenador por voz para personas con movilidad reducida.**
+
+            Reconocimiento de voz LOCAL: el audio nunca sale de tu ordenador.
+
+            ### Verificación de integridad
+
+            Para comprobar que el archivo descargado es auténtico, abre PowerShell
+            en la carpeta donde lo hayas descargado y ejecuta:
+
+            ```powershell
+            Get-FileHash -Algorithm SHA256 .\tapunto-voz.exe
+            ```
+
+            El valor que aparezca debe coincidir con el contenido del archivo
+            `tapunto-voz.exe.sha256` que se publica junto al ejecutable.
+
+            ### Verificación de la firma digital
+
+            Haz clic derecho sobre `tapunto-voz.exe` → Propiedades →
+            pestaña «Firmas digitales». La firma debe corresponder a
+            [NOMBRE DEL TITULAR INDICADO EN LOS T&C].
+
+            ### Requisitos
+            - Windows 10 o Windows 11 (64 bits)
+            - Micrófono (integrado o externo)
+            - Conexión a internet NO necesaria para el reconocimiento (sí
+              recomendable la primera vez para descargar el modelo de voz)
+
+            ### Documento legal
+            Antes de utilizar el programa, lee las
+            [condiciones de uso y la política de privacidad](https://tapunto.app/legal.html).

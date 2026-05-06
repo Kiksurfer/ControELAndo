@@ -1,0 +1,23 @@
+# tapunto-voz · requirements.txt · v2.0
+# Reconocimiento de voz LOCAL: el audio nunca sale del ordenador del usuario.
+# Esto elimina la transferencia internacional de datos personales y simplifica
+# de forma muy notable el cumplimiento del RGPD.
+
+# --- Reconocimiento de voz (local, sin nube) ---
+vosk>=0.3.45
+sounddevice>=0.4.6
+numpy>=1.24.0,<2.0.0
+
+# --- Control del sistema (igual que v1) ---
+pyautogui>=0.9.54
+keyboard>=0.13.5
+pyperclip>=1.8.2
+pywin32>=306
+pycaw>=20230407
+comtypes>=1.2.0
+
+# --- Cifrado del archivo de configuración local ---
+cryptography>=42.0.0
+
+# --- Empaquetado (solo para compilación, no se incluye en el .exe) ---
+pyinstaller>=6.0.0

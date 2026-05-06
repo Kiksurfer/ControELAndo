@@ -1,71 +1,98 @@
-# ControELAndo · SuperCapa
+# tapunto-voz
 
-Capa de accesibilidad por voz para Windows. Pensada para personas con
-movilidad reducida que conservan el habla: superpone una cuadrícula sobre
-la pantalla y permite controlar el cursor, dictar texto, abrir programas
-y manejar ventanas hablando.
+**Control del ordenador por voz para personas con movilidad reducida.**
 
-## Descargar
+[![Construir tapunto-voz.exe](https://github.com/USUARIO/REPOSITORIO/actions/workflows/build.yml/badge.svg)](https://github.com/USUARIO/REPOSITORIO/actions/workflows/build.yml)
+[![Última versión](https://img.shields.io/github/v/release/USUARIO/REPOSITORIO?label=última%20versión)](https://github.com/USUARIO/REPOSITORIO/releases/latest)
+[![Licencia](https://img.shields.io/github/license/USUARIO/REPOSITORIO)](LICENSE)
 
-**Para usuarios:** [última versión publicada (Releases)](../../releases/latest)
+---
 
-Descarga `SuperCapa.exe`, doble clic y va. No hay que instalar Python ni
-nada.
+## ¿Qué es?
 
-> Si Windows muestra un aviso azul de SmartScreen al abrir el .exe:
-> **Más información** → **Ejecutar de todas formas**. Solo la primera vez.
+tapunto-voz es un programa gratuito de código abierto que permite manejar el ordenador completamente con la voz. Mediante una rejilla superpuesta a la pantalla, el usuario puede mover el cursor, hacer clic, escribir texto y ejecutar cualquier acción del sistema operativo sin necesidad de usar las manos.
 
-## Novedades v4
+Diseñado especialmente para personas con esclerosis lateral amiotrófica (ELA) u otras condiciones que limiten el uso de las manos.
 
-- **Indicador de escucha** en pantalla (verde = oyendo, amarillo =
-  procesando, gris = dormido, rojo = sin micro o sin internet).
-- **Confirmación visual** del último comando reconocido.
-- **Modo dormir/despertar**: di *"dormir"* y deja de actuar; *"despierta"*
-  y vuelve.
-- **Comando de emergencia** *"socorro"* que deja todo en estado seguro.
-- **Configuración persistente** (`config.json` recuerda preferencias).
-- **Marcar celda sin clicar**: *"marcar A1"* la resalta en verde.
-- **Arrastrar archivos por voz**: *"coger A1"* … *"soltar T15"*.
-- **Cooldown anti-doble-clic**.
-- **Barra flotante** ahora abajo-centro y minimizada por defecto.
+> **Funciona sin conexión a internet.** El reconocimiento de voz se realiza localmente en tu ordenador con el motor Vosk. El audio no sale de tu equipo en ningún momento.
 
-## Comandos de voz (resumen)
+## Descarga
 
-| Categoría | Ejemplos |
-|-----------|----------|
-| Cuadrícula | "rejilla", "ocultar", "marcar A1", "desmarcar" |
-| Clic | "A uno", "be 7", "doble a 3", "clic derecho b 5" |
-| Arrastrar | "coger A1" → "soltar T15", "cancelar arrastre" |
-| Edición | "copiar", "pegar", "cortar", "borrar", "seleccionar todo", "intro" |
-| Ventanas | "cierra esto", "ponlo en grande", "minimiza", "cambia de ventana" |
-| Sistema | "abre una carpeta", "muestra el escritorio", "teclado" |
-| Dictado | "texto", "borrar palabra", "borrar todo", "quitar texto" |
-| Ratón | "arriba", "abajo 3", "izquierda", "derecha", "más rápido" |
-| Volumen | "sube el volumen", "silencio", "volumen máximo" |
-| Estado | "dormir", "despierta", "socorro" |
-| Cerrar | "salir del programa" |
+👉 **[Descargar tapunto-voz.exe (última versión)](https://github.com/USUARIO/REPOSITORIO/releases/latest/download/tapunto-voz.exe)**
 
-Atajos de teclado: **F8** rejilla · **F9** salir · **F10** teclado · **F11** dormir
+**Requisitos:** Windows 10 / 11 · Micrófono
 
-## Para desarrolladores
+### Verificación de la descarga
 
-El `.exe` se compila automáticamente en GitHub Actions cada vez que se
-sube código. Para probar en local:
+Antes de ejecutar el programa, comprueba que el archivo descargado es auténtico:
 
-```bash
-pip install pyautogui SpeechRecognition keyboard pyaudio pyperclip pycaw comtypes
-python supercapa.py
+**1. Verifica la firma digital.** Haz clic derecho sobre `tapunto-voz.exe` → Propiedades → pestaña «Firmas digitales». La firma debe corresponder al titular indicado en las [condiciones de uso](https://tapunto.app/legal.html).
+
+**2. Verifica el hash SHA-256.** Junto al ejecutable se publica un archivo `tapunto-voz.exe.sha256`. Para comprobarlo, abre PowerShell en la carpeta donde lo hayas descargado y ejecuta:
+
+```powershell
+Get-FileHash -Algorithm SHA256 .\tapunto-voz.exe
 ```
 
-Para publicar una nueva versión pública:
+El valor mostrado debe coincidir con el contenido del archivo `.sha256`.
 
-```bash
-git tag v1.1.0
-git push origin v1.1.0
-```
+> Si Windows muestra una advertencia de SmartScreen, **NO la ignores**: comprueba primero la firma y el hash. Si todo cuadra, puedes proceder con seguridad. Si algo no cuadra, no ejecutes el archivo y avisa por correo a contacto@tapunto.app.
 
-GitHub compila los `.exe` y publica una Release automáticamente.
+## Primer uso
+
+La primera vez que abras el programa, aparecerá una pantalla de información y consentimiento que te explicará:
+
+- Que el programa utiliza un sistema de inteligencia artificial para reconocer tu voz.
+- Que el reconocimiento se realiza localmente y el audio no sale de tu ordenador.
+- Qué datos guarda el programa en tu equipo y dónde.
+- Cómo retirar el consentimiento en cualquier momento.
+
+Solo si aceptas esta información el programa se activa.
+
+## Comandos principales
+
+| Di esto | Resultado |
+|---|---|
+| `rejilla` | Muestra la rejilla sobre la pantalla |
+| `A 5` / `B 12` | Mueve el cursor a esa celda |
+| `clic A 5` | Mueve y hace clic |
+| `zoom A5` | Subdivide la celda en 4 para mayor precisión |
+| `texto` | Activa el modo dictado |
+| `ayuda` | Muestra todos los comandos disponibles |
+| `dormir` / `despierta` | Pausa y reactiva el programa |
+| `bloquear` | Bloquea el reconocimiento (requiere palabra de desbloqueo personal) |
+
+## Desarrolladores
+
+- Enrique García Prats
+- Jorge García Prats
+- Alicia Prats Martínez
+
+## Condiciones de uso, privacidad y contacto
+
+- **[Condiciones de uso](https://tapunto.app/legal.html)** y política de privacidad.
+- **Contacto general:** contacto@tapunto.app
+- **Privacidad y derechos del interesado:** privacidad@tapunto.app
+- **Reportar vulnerabilidades de seguridad:** ver [SECURITY.md](SECURITY.md)
 
 ## Licencia
 
-Ver [LICENSE](LICENSE).
+El código fuente se distribuye bajo la licencia indicada en el archivo `LICENSE`. Las dependencias de terceros se listan en `NOTICE` con sus respectivas licencias.
+
+## Compilar desde el código fuente
+
+```bash
+git clone https://github.com/USUARIO/REPOSITORIO.git
+cd REPOSITORIO
+python -m venv .venv
+.venv\Scripts\activate     # en Linux/Mac: source .venv/bin/activate
+pip install -r requirements.txt
+python supercapa.py
+```
+
+Para generar el `.exe` final, GitHub Actions se encarga automáticamente al crear un tag de versión:
+
+```bash
+git tag v2.0
+git push origin v2.0
+```
