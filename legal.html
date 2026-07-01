@@ -122,7 +122,7 @@
 
 <header>
   <h1>Condiciones de uso, Privacidad y Aviso Legal</h1>
-  <p>tapunto-voz · Versión 2.0 · En vigor desde [DD de MM de AAAA]</p>
+  <p>tapunto-voz · Versión 1.1 · En vigor desde mayo de 2025</p>
 </header>
 
 <nav class="toc" aria-label="Índice de contenidos">
@@ -152,7 +152,7 @@
     conjuntamente, «el Servicio») es:
   </p>
   <dl class="id-block">
-    <dt>Titular:</dt><dd>[NOMBRE COMPLETO o DENOMINACIÓN SOCIAL]</dd>
+    <dt>Titular:</dt><dd>Enrique García Prats, Jorge García Prats, Alicia Prats Martínez</dd>
     <dt>NIF / CIF:</dt><dd>[NIF / CIF]</dd>
     <dt>Domicilio:</dt><dd>[DIRECCIÓN POSTAL COMPLETA, INCLUYENDO CÓDIGO POSTAL Y MUNICIPIO]</dd>
     <dt>Correo electrónico de contacto:</dt><dd><a href="mailto:contacto@tapunto.app">contacto@tapunto.app</a></dd>
@@ -280,10 +280,13 @@
     poco frecuentes. El usuario debe tener presente esta limitación.
   </p>
   <p>
-    El proveedor del modelo de IA empleado por defecto en la versión actual
-    es <strong>Vosk Speech Recognition Toolkit (Alpha Cephei Inc.)</strong>,
-    modelo «vosk-model-small-es-0.42». Este modelo se ejecuta íntegramente
-    en el ordenador del usuario.
+    El servicio de reconocimiento empleado es
+    <strong>Google Speech Recognition (Google LLC)</strong>,
+    al que se transmiten los fragmentos de audio mediante una conexión
+    cifrada por HTTPS. El tratamiento que Google realiza sobre dichos
+    datos se rige por su propia
+    <a href="https://policies.google.com/privacy" target="_blank"
+    rel="noopener">política de privacidad</a>.
   </p>
 
   <h3>1.10 Propiedad intelectual e industrial</h3>
@@ -339,7 +342,7 @@
     de los derechos digitales (LOPDGDD), el responsable del tratamiento es:
   </p>
   <dl class="id-block">
-    <dt>Identidad:</dt><dd>[NOMBRE COMPLETO o DENOMINACIÓN SOCIAL]</dd>
+    <dt>Identidad:</dt><dd>Enrique García Prats, Jorge García Prats, Alicia Prats Martínez</dd>
     <dt>NIF / CIF:</dt><dd>[NIF / CIF]</dd>
     <dt>Dirección postal:</dt><dd>[DIRECCIÓN POSTAL]</dd>
     <dt>Correo de privacidad:</dt><dd><a href="mailto:privacidad@tapunto.app">privacidad@tapunto.app</a></dd>
@@ -354,17 +357,16 @@
   <h4>Audio capturado por el micrófono</h4>
   <p>
     Cuando el usuario activa el reconocimiento de voz, el programa captura
-    fragmentos de audio del micrófono. <strong>El reconocimiento se realiza
-    íntegramente en el ordenador del usuario mediante el motor Vosk.</strong>
-    El audio NO se transmite a ningún servidor, NO se almacena en disco
-    y NO es accesible al titular ni a ningún tercero. Se procesa en memoria,
-    se traduce a texto y se descarta inmediatamente.
+    fragmentos de audio del micrófono y los envía a los servidores de
+    <strong>Google Speech Recognition (Google LLC)</strong> mediante
+    una conexión cifrada por HTTPS para su transcripción a texto.
+    El audio no se almacena permanentemente en el ordenador del usuario.
   </p>
 
-  <h4>Configuración local (config.json.enc)</h4>
+  <h4>Configuración local (config.json)</h4>
   <p>
     El programa guarda en el ordenador del usuario un archivo de
-    configuración cifrado que contiene preferencias técnicas y, si el usuario
+    configuración que contiene preferencias técnicas y, si el usuario
     decide grabarlos, alias de voz personalizados. Este archivo se almacena
     exclusivamente en el ordenador del usuario y no se sincroniza con el
     titular.
@@ -398,7 +400,7 @@
       </tr>
       <tr>
         <td>Configuración personalizada del programa.</td>
-        <td>config.json.enc local.</td>
+        <td>config.json local.</td>
         <td>Ejecución de la relación de uso (art. 6.1.b).</td>
       </tr>
       <tr>
@@ -417,7 +419,7 @@
   <h3>2.4 Plazos de conservación</h3>
   <ul>
     <li><strong>Audio capturado:</strong> se procesa en memoria y se elimina inmediatamente. No hay almacenamiento ni en local ni en servidores.</li>
-    <li><strong>config.json.enc:</strong> hasta que el usuario lo elimine voluntariamente o desinstale el programa.</li>
+    <li><strong>config.json:</strong> hasta que el usuario lo elimine voluntariamente o desinstale el programa.</li>
     <li><strong>Historial de comandos en memoria:</strong> los doce últimos, eliminados al cerrar el programa.</li>
     <li><strong>Datos de donativos:</strong> seis años (art. 30 Código de Comercio) o cuatro años a efectos tributarios, prevaleciendo el más largo.</li>
     <li><strong>Comunicaciones:</strong> hasta resolución del trámite y prescripción de las posibles acciones derivadas.</li>
@@ -441,7 +443,7 @@
   <p>
     En la versión actual no se producen transferencias internacionales de
     datos personales por la actividad de reconocimiento del habla, dado que
-    el procesamiento es local.
+    servidores de Google LLC (EEUU), amparado en cláusulas contractuales tipo.
   </p>
   <p>
     En la medida en que el usuario utilice servicios accesorios prestados por
@@ -486,8 +488,8 @@
     El titular adopta las medidas técnicas y organizativas necesarias para
     garantizar un nivel de seguridad adecuado al riesgo, conforme al
     artículo 32 RGPD. Entre ellas: ejecutable firmado digitalmente,
-    publicación de hash SHA-256 para verificación de integridad, cifrado del
-    archivo de configuración local con AES, y mantenimiento actualizado del
+    publicación de hash SHA-256 para verificación de integridad y
+    mantenimiento actualizado del
     inventario de dependencias del programa.
   </p>
   <p>
@@ -526,12 +528,12 @@
     y del programa «tapunto-voz»:
   </p>
   <dl class="id-block">
-    <dt>Titular:</dt><dd>[NOMBRE COMPLETO o DENOMINACIÓN SOCIAL]</dd>
+    <dt>Titular:</dt><dd>Enrique García Prats, Jorge García Prats, Alicia Prats Martínez</dd>
     <dt>NIF / CIF:</dt><dd>[NIF / CIF]</dd>
     <dt>Dirección postal:</dt><dd>[DIRECCIÓN COMPLETA]</dd>
     <dt>Correo:</dt><dd><a href="mailto:contacto@tapunto.app">contacto@tapunto.app</a></dd>
     <dt>Sitio web:</dt><dd>https://tapunto.app</dd>
-    <dt>Datos registrales:</dt><dd>[SI PROCEDE]</dd>
+    
   </dl>
 
   <h3>3.2 Condiciones de acceso y uso</h3>
@@ -611,7 +613,7 @@
 </section>
 
 <div class="meta">
-  <strong>Versión 2.0 — En vigor desde [DD de MM de AAAA].</strong><br>
+  <strong>Versión 1.1 — En vigor desde [DD de MM de AAAA].</strong><br>
   Última revisión del documento: [DD de MM de AAAA].
 </div>
 
@@ -624,7 +626,7 @@
     <a href="mailto:contacto@tapunto.app">Contacto</a>
   </p>
   <p style="margin-top:8px;">
-    © [AÑO] [NOMBRE COMPLETO o DENOMINACIÓN SOCIAL]
+    © 2025 Enrique García Prats, Jorge García Prats, Alicia Prats Martínez
   </p>
 </footer>
 
