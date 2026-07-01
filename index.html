@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>tapunto-voz — Control del ordenador por voz</title>
-  <meta name="description" content="tapunto-voz: programa gratuito de código abierto de control del ordenador por voz, diseñado para personas con esclerosis lateral amiotrófica y otras condiciones que limiten el uso de las manos. Reconocimiento local, sin envío de audio a la nube." />
+  <meta name="description" content="tapunto-voz: programa gratuito de código abierto de control del ordenador por voz, diseñado para personas con esclerosis lateral amiotrófica (ELA) y otras condiciones que limiten el uso de las manos." />
   <style>
     :root {
       --azul:        #1565C0;
@@ -24,7 +24,6 @@
       background: var(--blanco);
       line-height: 1.6;
     }
-    /* foco visible en cualquier elemento interactivo */
     a:focus, button:focus, [tabindex]:focus {
       outline: 3px solid var(--naranja);
       outline-offset: 2px;
@@ -87,23 +86,12 @@
     }
     .req-bar span { margin: 0 6px; }
 
-    /* ── AVISO DE IA y DATOS ── */
-    .aviso-ia {
-      background: var(--azul-claro);
-      border-left: 5px solid var(--azul);
-      max-width: 820px;
-      margin: 32px auto;
-      padding: 20px 24px;
-      border-radius: 0 8px 8px 0;
-      font-size: 0.95rem;
-    }
-    .aviso-ia strong { color: var(--azul-osc); }
-
+    /* ── AVISOS ── */
     .aviso-legal {
       background: #FFF8E1;
       border-left: 5px solid #F9A825;
       max-width: 820px;
-      margin: 24px auto;
+      margin: 32px auto;
       padding: 20px 24px;
       border-radius: 0 8px 8px 0;
       font-size: 0.93rem;
@@ -169,8 +157,8 @@
     .card strong { display: block; color: var(--azul-osc); margin-bottom: 4px; }
     .card span { font-size: 0.88rem; color: #444; }
 
-    /* ── VERIFICACIÓN ── */
-    .verify {
+    /* ── AVISO WINDOWS ── */
+    .windows-warning {
       background: var(--verde-claro);
       border-left: 5px solid var(--verde);
       border-radius: 0 8px 8px 0;
@@ -178,11 +166,7 @@
       margin: 20px 0;
       font-size: 0.93rem;
     }
-    .verify strong { color: var(--verde); }
-    .verify code {
-      background: #fff; padding: 2px 6px; border-radius: 4px;
-      font-family: Consolas, monospace; font-size: 0.88rem;
-    }
+    .windows-warning strong { color: var(--verde); }
 
     /* ── AUTORES ── */
     .autores {
@@ -208,7 +192,11 @@
       font-size: 0.92rem;
     }
     .identificacion h3 { margin-bottom: 8px; color: var(--azul-osc); }
-    .identificacion dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; }
+    .identificacion dl {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      gap: 6px 16px;
+    }
     .identificacion dt { font-weight: 600; }
 
     /* ── FOOTER ── */
@@ -231,83 +219,73 @@
   <h1>tapunto<span>-voz</span></h1>
   <p>Control total del ordenador mediante la voz. Diseñado para personas con movilidad reducida.</p>
   <a class="btn-download"
-     href="https://github.com/USUARIO/REPOSITORIO/releases/latest/download/tapunto-voz.exe">
+     href="https://github.com/Kiksurfer/ControELAndo/releases/latest/download/tapunto-voz.exe">
     Descargar tapunto-voz.exe
     <span class="sub">Windows 10 / 11 · Gratuito · Código abierto</span>
   </a>
   <p class="req-bar">
-    <span>Windows 10/11</span>·
-    <span>Micrófono</span>·
-    <span>Funciona sin internet</span>·
-    <span>~140 MB</span>
+    <span>🪟 Windows 10/11</span>·
+    <span>🎙 Micrófono</span>·
+    <span>🌐 Internet</span>·
+    <span>💾 ~120 MB</span>
   </p>
 </header>
 
-<!-- Aviso conforme al artículo 50 del Reglamento (UE) 2024/1689 (AI Act) -->
-<div class="aviso-ia">
-  <strong>Información sobre uso de inteligencia artificial.</strong>
-  Este programa utiliza un sistema de inteligencia artificial (motor Vosk de
-  reconocimiento del habla) para traducir tu voz en comandos. La transcripción
-  la realiza un modelo de aprendizaje automático y, por tanto, puede contener
-  errores. El reconocimiento se realiza
-  <strong>íntegramente en tu ordenador</strong>: el audio NO se envía a
-  ningún servidor externo y NO se comparte con terceros.
-</div>
-
 <div class="aviso-legal">
-  <strong>Antes de descargar.</strong>
+  <strong>⚠ Antes de descargar:</strong>
+  Este programa utiliza el micrófono de tu ordenador y envía el audio de voz
+  a los servidores de <strong>Google Speech Recognition</strong> para su transcripción.
   Al descargar y usar tapunto-voz aceptas las
-  <a href="/legal.html">Condiciones de uso, Política de Privacidad y Aviso Legal</a>.
-  El programa se ofrece sin garantía de funcionamiento. NO es un producto
-  sanitario y NO sustituye atención médica ni terapia ocupacional.
+  <a href="/legal.html">Condiciones de uso y Política de privacidad</a>.
+  El programa se ofrece sin garantía de funcionamiento.
+  NO es un producto sanitario y NO sustituye atención médica ni terapia ocupacional.
 </div>
 
 <main>
 
-  <!-- INSTALACIÓN Y VERIFICACIÓN -->
+  <!-- INSTALACIÓN -->
   <section id="instalar">
-    <h2>Cómo instalar y verificar</h2>
+    <h2>Cómo instalar</h2>
     <ol class="steps">
       <li>
         <div>
           <strong>Descarga el archivo</strong><br>
-          Haz clic en el botón de descarga. Se descargan dos ficheros:
-          <code>tapunto-voz.exe</code> y <code>tapunto-voz.exe.sha256</code>.
+          Haz clic en el botón de descarga. El archivo
+          <code>tapunto-voz.exe</code> pesa aproximadamente 120 MB
+          e incluye todo lo necesario — no hay que instalar Python.
         </div>
       </li>
       <li>
         <div>
-          <strong>Verifica la firma digital</strong><br>
-          Haz clic derecho sobre <code>tapunto-voz.exe</code> →
-          Propiedades → pestaña «Firmas digitales». La firma debe corresponder
-          al titular indicado más abajo en esta página.
+          <strong>Ejecuta con doble clic</strong><br>
+          No requiere instalación. Haz doble clic en el archivo descargado
+          para arrancar el programa.
         </div>
       </li>
       <li>
         <div>
-          <strong>Verifica el hash SHA-256</strong><br>
-          Abre PowerShell en la carpeta de descarga y ejecuta
-          <code>Get-FileHash -Algorithm SHA256 .\tapunto-voz.exe</code>.
-          El valor debe coincidir con el contenido del archivo
-          <code>.sha256</code>.
+          <strong>Si Windows muestra una advertencia</strong><br>
+          Haz clic en <em>"Más información"</em> y luego en
+          <em>"Ejecutar de todas formas"</em>. Es normal en programas
+          sin firma digital de pago.
         </div>
       </li>
       <li>
         <div>
-          <strong>Ejecuta y acepta la información</strong><br>
-          Doble clic. La primera vez aparece una pantalla con la información
-          previa al uso. Léela con calma y acéptala si estás conforme.
-          Solo entonces se activa el reconocimiento de voz.
+          <strong>Mantén el micrófono y el internet activos</strong><br>
+          El reconocimiento de voz requiere conexión a internet (Google Speech).
+          Durante los primeros 3 segundos el programa calibra el ruido ambiente —
+          mantén silencio.
         </div>
       </li>
     </ol>
 
-    <div class="verify">
-      <strong>Si Windows muestra advertencia de SmartScreen:</strong>
-      no la ignores. Comprueba primero la firma y el hash siguiendo los
-      pasos 2 y 3. Si la firma es correcta y el hash coincide, el archivo
-      es auténtico aunque Windows pida confirmación. Si algo no encaja, NO
-      ejecutes el archivo y avisa por correo a contacto@tapunto.app.
+    <div class="windows-warning">
+      <strong>✅ Primer uso recomendado:</strong>
+      Di <strong>"rejilla"</strong> para activar la cuadrícula,
+      luego <strong>"A 5"</strong> para mover el cursor a esa celda,
+      y <strong>"clic A 5"</strong> para hacer clic.
+      Di <strong>"ayuda"</strong> para ver todos los comandos disponibles.
     </div>
   </section>
 
@@ -328,22 +306,22 @@
       <div class="card">
         <div class="icon" aria-hidden="true">🔍</div>
         <strong>Zoom de celda</strong>
-        <span>Subdivide celdas para selección precisa</span>
+        <span>Subdivide celdas para selección precisa de elementos pequeños</span>
       </div>
       <div class="card">
         <div class="icon" aria-hidden="true">🗣</div>
         <strong>Tu propia voz</strong>
-        <span>El programa aprende cómo pronuncias cada comando</span>
+        <span>Graba cómo tú pronuncias cada comando. El programa aprende tu voz</span>
       </div>
       <div class="card">
-        <div class="icon" aria-hidden="true">🔒</div>
-        <strong>Privacidad por diseño</strong>
-        <span>El audio nunca sale de tu ordenador</span>
+        <div class="icon" aria-hidden="true">🎚</div>
+        <strong>Sensibilidad ajustable</strong>
+        <span>Tres perfiles de micrófono: voz suave, normal o entorno ruidoso</span>
       </div>
       <div class="card">
-        <div class="icon" aria-hidden="true">🛡</div>
-        <strong>Comando de bloqueo</strong>
-        <span>Palabra personal para evitar comandos no deseados</span>
+        <div class="icon" aria-hidden="true">📋</div>
+        <strong>Historial y ayuda</strong>
+        <span>Últimos 12 comandos y guía rápida accesibles por voz</span>
       </div>
     </div>
   </section>
@@ -354,7 +332,7 @@
     <ul>
       <li><strong>Sistema operativo:</strong> Windows 10 o Windows 11 (64 bits)</li>
       <li><strong>Micrófono:</strong> integrado o externo (recomendado externo con cancelación de ruido)</li>
-      <li><strong>Conexión a internet:</strong> NO necesaria para usarlo. Solo se utiliza la primera vez si decides actualizar el modelo de voz.</li>
+      <li><strong>Conexión a internet:</strong> necesaria para el reconocimiento de voz (Google Speech Recognition)</li>
       <li><strong>Python:</strong> no es necesario instalarlo — el ejecutable lo incluye todo</li>
     </ul>
   </section>
@@ -376,7 +354,7 @@
          style="display:inline-block; margin-top:14px; background:rgba(255,255,255,0.2);
                 color:#fff; padding:10px 24px; border-radius:6px; text-decoration:none;
                 font-size:0.95rem;">
-        Apoyar el proyecto (donativo voluntario)
+        ☕ Apoyar el proyecto (donativo voluntario)
       </a>
     </div>
   </section>
@@ -385,20 +363,15 @@
   <section id="identificacion">
     <h2>Identificación del prestador</h2>
     <p>
-      A efectos del artículo 10 de la Ley 34/2002, de servicios de la sociedad
-      de la información y de comercio electrónico, se hacen constar los
-      siguientes datos:
+      A efectos del artículo 10 de la Ley 34/2002 de servicios de la sociedad
+      de la información, se hacen constar los siguientes datos:
     </p>
     <div class="identificacion">
       <h3>Titular del Servicio</h3>
       <dl>
-        <dt>Nombre / razón social:</dt><dd>[NOMBRE COMPLETO o DENOMINACIÓN SOCIAL]</dd>
-        <dt>NIF / CIF:</dt><dd>[NIF o CIF]</dd>
-        <dt>Domicilio:</dt><dd>[DIRECCIÓN POSTAL COMPLETA]</dd>
+        <dt>Nombre:</dt><dd>Enrique García Prats, Jorge García Prats, Alicia Prats Martínez</dd>
         <dt>Correo de contacto:</dt><dd><a href="mailto:contacto@tapunto.app">contacto@tapunto.app</a></dd>
         <dt>Privacidad:</dt><dd><a href="mailto:privacidad@tapunto.app">privacidad@tapunto.app</a></dd>
-        <dt>Seguridad:</dt><dd><a href="mailto:seguridad@tapunto.app">seguridad@tapunto.app</a></dd>
-        <dt>Datos registrales:</dt><dd>[SI PROCEDE]</dd>
       </dl>
     </div>
   </section>
@@ -407,12 +380,13 @@
 
 <footer>
   <p>
-    tapunto-voz · <a href="/legal.html">Condiciones de uso, Privacidad y Aviso Legal</a>
-    · <a href="https://github.com/USUARIO/REPOSITORIO" target="_blank" rel="noopener">Código fuente (GitHub)</a>
-    · <a href="mailto:contacto@tapunto.app">Contacto</a>
+    tapunto-voz ·
+    <a href="/legal.html">Condiciones de uso y Privacidad</a> ·
+    <a href="https://github.com/Kiksurfer/ControELAndo" target="_blank" rel="noopener">Código fuente (GitHub)</a> ·
+    <a href="mailto:contacto@tapunto.app">Contacto</a>
   </p>
   <p style="margin-top:8px;">
-    © [AÑO] [NOMBRE COMPLETO o DENOMINACIÓN SOCIAL]
+    © 2025 Enrique García Prats, Jorge García Prats, Alicia Prats Martínez
   </p>
 </footer>
 
