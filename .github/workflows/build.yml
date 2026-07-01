@@ -1,19 +1,13 @@
 name: Construir tapunto-voz.exe
 
-# Se activa al crear un tag (v1.0, v1.1...) o manualmente desde la web de GitHub
 on:
   push:
     tags:
       - 'v*'
   workflow_dispatch:
-    inputs:
-      version_notes:
-        description: 'Notas de la versión (opcional)'
-        required: false
-        default: 'Nueva versión de tapunto-voz'
 
 permissions:
-  contents: write    # necesario para crear releases
+  contents: write
 
 jobs:
   build:
@@ -21,36 +15,38 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      # 1. Clonar el repositorio
       - name: Clonar repositorio
         uses: actions/checkout@v4
 
-      # 2. Instalar Python 3.11
       - name: Instalar Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: 'pip'
 
-      # 3. Instalar dependencias
       - name: Instalar dependencias
+        shell: pwsh
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          # Instalar PyAudio desde binario precompilado (evita necesitar Visual C++)
+          pip install pipwin
+          pipwin install pyaudio
+          # Resto de dependencias
+          pip install pyautogui SpeechRecognition keyboard pyperclip pywin32 pycaw comtypes pyinstaller
 
-      # 4. Verificar sintaxis del código fuente
       - name: Verificar sintaxis de supercapa.py
         run: |
           python -c "import ast; ast.parse(open('supercapa.py','r',encoding='utf-8').read()); print('supercapa.py OK')"
 
-      # 5. Generar el .exe con PyInstaller
       - name: Generar tapunto-voz.exe
+        shell: pwsh
         run: |
           pyinstaller `
             --onefile `
             --noconsole `
             --name "tapunto-voz" `
             --hidden-import=speech_recognition `
+            --hidden-import=pyaudio `
             --hidden-import=pyperclip `
             --hidden-import=keyboard `
             --hidden-import=win32gui `
@@ -62,7 +58,6 @@ jobs:
             --hidden-import=pkg_resources.extern `
             supercapa.py
 
-      # 6. Calcular hash SHA-256 del ejecutable
       - name: Calcular SHA-256
         shell: pwsh
         run: |
@@ -71,7 +66,6 @@ jobs:
           Set-Content -Path "dist\tapunto-voz.exe.sha256" -Value $line -NoNewline
           Write-Host "SHA-256: $hash"
 
-      # 7. Subir el .exe como artefacto descargable (30 días)
       - name: Subir artefacto
         uses: actions/upload-artifact@v4
         with:
@@ -81,7 +75,6 @@ jobs:
             dist/tapunto-voz.exe.sha256
           retention-days: 30
 
-      # 8. Publicar en GitHub Releases (solo cuando hay un tag v*)
       - name: Publicar en GitHub Releases
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
@@ -99,32 +92,14 @@ jobs:
 
             ---
 
-            ### Descarga e instalación
+            ### Instalación
 
-            1. Descarga el archivo `tapunto-voz.exe`
-            2. Ejecuta con doble clic — no requiere instalar Python
+            1. Descarga `tapunto-voz.exe`
+            2. Doble clic para ejecutar — no requiere instalar nada
             3. Mantén el micrófono conectado y la conexión a internet activa
 
-            ### Verificación del archivo (opcional)
+            ### Si Windows muestra advertencia de seguridad
+            Haz clic en **"Más información"** → **"Ejecutar de todas formas"**
 
-            Para comprobar que el archivo no ha sido modificado, abre PowerShell
-            en la carpeta de descarga y ejecuta:
-
-            ```powershell
-            Get-FileHash -Algorithm SHA256 .\tapunto-voz.exe
-            ```
-
-            El valor debe coincidir con el contenido del archivo `tapunto-voz.exe.sha256`.
-
-            ### Requisitos
-            - Windows 10 o Windows 11 (64 bits)
-            - Micrófono (integrado o externo)
-            - Conexión a internet (necesaria para el reconocimiento de voz)
-
-            ### Nota de seguridad
-            Si Windows muestra "Windows protegió su PC", haz clic en
-            **"Más información"** y luego **"Ejecutar de todas formas"**.
-
-            ### Antes de instalar
-            Lee las [condiciones de uso](https://tapunto.app/legal.html)
-            antes de utilizar este programa.
+            ### Condiciones de uso
+            Lee las [condiciones de uso](https://tapunto.app/legal.html) antes de utilizar el programa.
