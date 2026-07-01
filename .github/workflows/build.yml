@@ -24,19 +24,24 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
 
-      - name: Instalar dependencias
+      - name: Instalar dependencias y PyAudio
         shell: pwsh
         run: |
           python -m pip install --upgrade pip
-          # Instalar PyAudio desde binario precompilado (evita necesitar Visual C++)
-          pip install pipwin
-          pipwin install pyaudio
+
+          # Descargar PyAudio wheel precompilado para Python 3.11 Windows 64bit
+          $url = "https://files.pythonhosted.org/packages/52/99/c41e2e4e7a4d5c83696a28bc7a1885b8f6f51fa9e34a79e1d4db773e2e40/PyAudio-0.2.14-cp311-cp311-win_amd64.whl"
+          Invoke-WebRequest -Uri $url -OutFile "PyAudio.whl" -UseBasicParsing
+          pip install PyAudio.whl
+
           # Resto de dependencias
           pip install pyautogui SpeechRecognition keyboard pyperclip pywin32 pycaw comtypes pyinstaller
 
+      - name: Verificar que PyAudio está instalado
+        run: python -c "import pyaudio; print('PyAudio OK:', pyaudio.__version__)"
+
       - name: Verificar sintaxis de supercapa.py
-        run: |
-          python -c "import ast; ast.parse(open('supercapa.py','r',encoding='utf-8').read()); print('supercapa.py OK')"
+        run: python -c "import ast; ast.parse(open('supercapa.py','r',encoding='utf-8').read()); print('supercapa.py OK')"
 
       - name: Generar tapunto-voz.exe
         shell: pwsh
@@ -90,16 +95,13 @@ jobs:
 
             Desarrollado por Enrique García Prats, Jorge García Prats y Alicia Prats Martínez.
 
-            ---
-
             ### Instalación
-
             1. Descarga `tapunto-voz.exe`
-            2. Doble clic para ejecutar — no requiere instalar nada
-            3. Mantén el micrófono conectado y la conexión a internet activa
+            2. Doble clic — no requiere instalar nada
+            3. Micrófono conectado e internet activo
 
-            ### Si Windows muestra advertencia de seguridad
+            ### Advertencia de Windows
             Haz clic en **"Más información"** → **"Ejecutar de todas formas"**
 
             ### Condiciones de uso
-            Lee las [condiciones de uso](https://tapunto.app/legal.html) antes de utilizar el programa.
+            [tapunto.app/legal.html](https://tapunto.app/legal.html)
