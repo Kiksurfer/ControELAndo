@@ -22,26 +22,23 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          cache: 'pip'
 
       - name: Instalar dependencias y PyAudio
         shell: pwsh
         run: |
           python -m pip install --upgrade pip
 
-          # Descargar PyAudio wheel precompilado para Python 3.11 Windows 64bit
-          $url = "https://files.pythonhosted.org/packages/52/99/c41e2e4e7a4d5c83696a28bc7a1885b8f6f51fa9e34a79e1d4db773e2e40/PyAudio-0.2.14-cp311-cp311-win_amd64.whl"
-          Invoke-WebRequest -Uri $url -OutFile "PyAudio.whl" -UseBasicParsing
-          pip install PyAudio.whl
+          # PyAudio con Visual C++ que ya incluye windows-latest
+          pip install pyaudio
 
           # Resto de dependencias
           pip install pyautogui SpeechRecognition keyboard pyperclip pywin32 pycaw comtypes pyinstaller
 
-      - name: Verificar que PyAudio está instalado
-        run: python -c "import pyaudio; print('PyAudio OK:', pyaudio.__version__)"
+      - name: Verificar PyAudio
+        run: python -c "import pyaudio; print('PyAudio OK')"
 
-      - name: Verificar sintaxis de supercapa.py
-        run: python -c "import ast; ast.parse(open('supercapa.py','r',encoding='utf-8').read()); print('supercapa.py OK')"
+      - name: Verificar sintaxis
+        run: python -c "import ast; ast.parse(open('supercapa.py','r',encoding='utf-8').read()); print('OK')"
 
       - name: Generar tapunto-voz.exe
         shell: pwsh
@@ -60,15 +57,13 @@ jobs:
             --hidden-import=pycaw `
             --hidden-import=comtypes `
             --hidden-import=comtypes.client `
-            --hidden-import=pkg_resources.extern `
             supercapa.py
 
       - name: Calcular SHA-256
         shell: pwsh
         run: |
           $hash = (Get-FileHash -Algorithm SHA256 dist\tapunto-voz.exe).Hash.ToLower()
-          $line = "$hash  tapunto-voz.exe"
-          Set-Content -Path "dist\tapunto-voz.exe.sha256" -Value $line -NoNewline
+          Set-Content -Path "dist\tapunto-voz.exe.sha256" -Value "$hash  tapunto-voz.exe" -NoNewline
           Write-Host "SHA-256: $hash"
 
       - name: Subir artefacto
