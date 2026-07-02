@@ -77,6 +77,13 @@ except ImportError:
     HAS_WIN32 = False
 
 try:
+    from cryptography.fernet import Fernet
+    import hashlib
+    HAS_CRYPTO = True
+except ImportError:
+    HAS_CRYPTO = False
+
+try:
     from ctypes import POINTER, cast
     from comtypes import CLSCTX_ALL
     from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
@@ -152,7 +159,7 @@ MIC_PROFILE_DEFAULT = "normal"
 
 
 # ============================================================
-#  CONFIG PERSISTENTE
+#  CONFIG PERSISTENTE (con cifrado opcional si cryptography está instalado)
 # ============================================================
 def get_config_path():
     """config.json al lado del .exe / del .py."""
@@ -163,24 +170,48 @@ def get_config_path():
     return os.path.join(base, "config.json")
 
 
+def _get_config_key():
+    """Genera una clave de cifrado derivada del usuario de Windows."""
+    try:
+        import getpass
+        seed = f"tapunto-voz-{getpass.getuser()}-config".encode()
+        key = hashlib.sha256(seed).digest()
+        # Fernet necesita exactamente 32 bytes en base64
+        import base64
+        return base64.urlsafe_b64encode(key)
+    except Exception:
+        return None
+
+
 def load_config():
     defaults = {
         "mouse_step": MOUSE_STEP_DEFAULT,
         "bar_visible": True,
         "bar_minimized": True,
-        "bar_x": None,        # None = centrar abajo
+        "bar_x": None,
         "bar_y": None,
         "grid_visible_on_start": True,
         "mic_profile": MIC_PROFILE_DEFAULT,
         "beep_enabled": True,
         "auto_sleep_secs": AUTO_SLEEP_SECS,
-        "terms_accepted": False,   # aceptación de términos
-        "terms_version": "",       # versión de términos aceptada
-        "tutorial_seen": False,    # si ya vio el tutorial
+        "terms_accepted": False,
+        "terms_version": "",
+        "tutorial_seen": False,
     }
+    path = get_config_path()
     try:
-        with open(get_config_path(), "r", encoding="utf-8") as f:
-            data = json.load(f)
+        with open(path, "rb") as f:
+            raw = f.read()
+        # Intentar descifrar si cryptography está disponible
+        if HAS_CRYPTO:
+            try:
+                key = _get_config_key()
+                if key:
+                    fernet = Fernet(key)
+                    raw = fernet.decrypt(raw)
+            except Exception:
+                pass  # Si falla el descifrado, intentar leer como texto plano
+        data = json.loads(raw.decode("utf-8"))
         defaults.update(data)
     except Exception:
         pass
@@ -188,11 +219,59 @@ def load_config():
 
 
 def save_config(cfg):
+    path = get_config_path()
     try:
-        with open(get_config_path(), "w", encoding="utf-8") as f:
-            json.dump(cfg, f, indent=2, ensure_ascii=False)
+        raw = json.dumps(cfg, indent=2, ensure_ascii=False).encode("utf-8")
+        if HAS_CRYPTO:
+            try:
+                key = _get_config_key()
+                if key:
+                    fernet = Fernet(key)
+                    raw = fernet.encrypt(raw)
+            except Exception:
+                pass  # Si falla el cifrado, guardar en texto plano
+        with open(path, "wb") as f:
+            f.write(raw)
     except Exception as e:
         print(f"[aviso] no se pudo guardar config: {e}")
+
+    except Exception as e:
+        print(f"[aviso] no se pudo guardar config: {e}")
+
+
+# Versión actual del programa
+APP_VERSION = "1.6"
+GITHUB_RELEASES_API = "https://api.github.com/repos/Kiksurfer/ControELAndo/releases/latest"
+
+def check_new_version(root):
+    """Comprueba en GitHub si hay versión más nueva. No bloquea el arranque."""
+    def _check():
+        try:
+            import urllib.request
+            req = urllib.request.Request(
+                GITHUB_RELEASES_API,
+                headers={"User-Agent": "tapunto-voz"}
+            )
+            with urllib.request.urlopen(req, timeout=5) as r:
+                data = json.loads(r.read().decode())
+            latest = data.get("tag_name", "").lstrip("v")
+            if latest and latest != APP_VERSION:
+                def _show():
+                    import tkinter.messagebox as mb
+                    if mb.askyesno(
+                        "Actualización disponible",
+                        f"Hay una nueva versión disponible: v{latest}\n"
+                        f"Tu versión actual es: v{APP_VERSION}\n\n"
+                        "¿Quieres abrir la página de descarga?",
+                        parent=root
+                    ):
+                        import webbrowser
+                        webbrowser.open("https://tapunto.app/tapunto-voz/")
+                root.after(3000, _show)
+        except Exception:
+            pass
+    import threading
+    threading.Thread(target=_check, daemon=True).start()
 
 
 # ============================================================
@@ -2660,6 +2739,8 @@ class SuperCapa:
         self.root.after(10000, self._check_internet_periodic)
         self.root.after(500, self._blink_dictate_hud)
         self.root.after(15000, self._check_auto_sleep)
+        # Comprobar versión nueva en segundo plano
+        self.root.after(5000, lambda: check_new_version(self.root))
 
         if self.cfg.get("grid_visible_on_start", True):
             self.grid.show()
