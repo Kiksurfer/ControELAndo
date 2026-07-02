@@ -1538,10 +1538,10 @@ class WelcomeDialog:
         "prescrito por un profesional sanitario.\n\n"
 
         "7. PROPIEDAD INTELECTUAL\n"
-        "El nombre TAPUNTO está registrado como marca en la OEPM. "
-        "El código se distribuye bajo licencia de código abierto "
-        "(ver archivo LICENSE). Queda prohibido redistribuir versiones "
-        "modificadas bajo el nombre TAPUNTO sin autorización expresa.\n\n"
+        "El nombre TAPUNTO, los logotipos y demás signos distintivos "
+        "del proyecto son propiedad de sus desarrolladores. "
+        "El código fuente se distribuye bajo licencia de código abierto "
+        "(ver archivo LICENSE).\n\n"
 
         "8. MODIFICACIONES Y CONTINUIDAD DEL SERVICIO\n"
         "Los desarrolladores se reservan el derecho a modificar, "
