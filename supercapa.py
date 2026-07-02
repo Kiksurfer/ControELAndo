@@ -2415,7 +2415,7 @@ class ActionBar:
         self.win.attributes("-alpha", 0.93)
         self.win.configure(bg="#1a1a1a")
 
-        self.expanded_w = 640
+        self.expanded_w = 780
         self.expanded_h = 46
         self.collapsed_w = 340
         self.collapsed_h = 28
@@ -2424,11 +2424,11 @@ class ActionBar:
         self.full_frame = tk.Frame(self.win, bg="#1a1a1a")
 
         def btn(parent, text, cmd, bg="#2e2e2e", fg="#FFFFFF", bold=False):
-            f = ("Segoe UI", 10, "bold") if bold else ("Segoe UI", 10)
+            f = ("Segoe UI", 9, "bold") if bold else ("Segoe UI", 9)
             return tk.Button(parent, text=text, command=cmd,
                              bg=bg, fg=fg,
                              activebackground="#555555", activeforeground="#FFFFFF",
-                             bd=0, padx=10, pady=6, font=f, relief="flat")
+                             bd=0, padx=8, pady=6, font=f, relief="flat")
 
         btn(self.full_frame, "Grabar Voz", self.ctrl.open_alias_manager,
             bg="#005533", bold=True).pack(side="left", padx=2, pady=3)
@@ -2473,7 +2473,7 @@ class ActionBar:
             command=self.ctrl.toggle_beep,
             bg="#2a3a2a", fg="#FFFFFF",
             activebackground="#444444",
-            bd=0, padx=8, pady=6,
+            bd=0, padx=6, pady=6,
             font=("Segoe UI", 10), relief="flat")
         self._beep_btn.pack(side="left", padx=1, pady=3)
 
@@ -2484,8 +2484,8 @@ class ActionBar:
         btn(self.full_frame, "≡", self.ctrl.open_history,
             bg="#2a2a2a", fg="#AAAAAA").pack(side="left", padx=1, pady=3)
 
-        btn(self.full_frame, "X", self.ctrl.quit,
-            bg="#5a1a1a", fg="#FF8888").pack(side="left", padx=2, pady=3)
+        btn(self.full_frame, "✕", self.ctrl.quit,
+            bg="#5a1a1a", fg="#FF6666").pack(side="left", padx=2, pady=3)
 
         self._update_mic_btn_highlight()
 
