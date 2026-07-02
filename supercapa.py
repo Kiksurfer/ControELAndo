@@ -1487,7 +1487,7 @@ class WelcomeDialog:
         "tapunto-voz es un programa gratuito y de código abierto "
         "desarrollado por Enrique García Prats, Jorge García Prats "
         "y Alicia Prats Martínez (en adelante, «los desarrolladores»). "
-        "Contacto: contacto@tapunto.app\n\n"
+        "Contacto: tapunto.soporte@gmail.com\n\n"
 
         "2. RECONOCIMIENTO DE VOZ Y DEPENDENCIA DE GOOGLE\n"
         "El programa utiliza Google Speech Recognition (Google LLC) "
@@ -1507,7 +1507,7 @@ class WelcomeDialog:
         "El programa guarda un archivo config.json con tus preferencias "
         "(alias de voz, posición de barra, perfil de micrófono) en la "
         "misma carpeta del ejecutable. Este archivo no sale de tu "
-        "ordenador. Más información en tapunto.app/legal.html\n\n"
+        "ordenador. Más información en tapunto.app/tapunto-voz/legal.html\n\n"
 
         "4. EXONERACIÓN DE RESPONSABILIDAD — DAÑOS AL EQUIPO\n"
         "El programa se ofrece TAL CUAL, sin garantía de ningún tipo. "
@@ -1549,8 +1549,8 @@ class WelcomeDialog:
         "sin previo aviso. Las actualizaciones pueden cambiar "
         "funcionalidades existentes.\n\n"
 
-        "Texto legal completo: https://tapunto.app/legal.html\n"
-        "Contacto: contacto@tapunto.app"
+        "Texto legal completo: https://tapunto.app/tapunto-voz/legal.html\n"
+        "Soporte: tapunto.soporte@gmail.com"
     )
 
     def __init__(self, cfg):
@@ -1563,39 +1563,55 @@ class WelcomeDialog:
         self.win.title("tapunto-voz — Bienvenida")
         sw = self.win.winfo_screenwidth()
         sh = self.win.winfo_screenheight()
-        w, h = 680, 620
+        w, h = 680, 640
         self.win.geometry(f"{w}x{h}+{(sw-w)//2}+{(sh-h)//2}")
-        self.win.resizable(False, False)
+        self.win.resizable(True, True)
         self.win.configure(bg="#0D47A1")
         self.win.protocol("WM_DELETE_WINDOW", self._reject)
 
+        # Estructura: cabecera azul arriba, cuerpo blanco ocupa el resto
+        self.win.rowconfigure(1, weight=1)
+        self.win.columnconfigure(0, weight=1)
+
         # ── Cabecera ──────────────────────────────────────────
         hdr = tk.Frame(self.win, bg="#0D47A1")
-        hdr.pack(fill="x", padx=0, pady=0)
+        hdr.grid(row=0, column=0, sticky="ew")
 
         tk.Label(hdr, text="tapunto-voz",
-                 font=("Segoe UI", 32, "bold"),
-                 fg="white", bg="#0D47A1").pack(pady=(28, 4))
+                 font=("Segoe UI", 28, "bold"),
+                 fg="white", bg="#0D47A1").pack(pady=(18, 2))
         tk.Label(hdr,
                  text="Control del ordenador por voz · tapunto.app",
                  font=("Segoe UI", 11), fg="#BBDEFB",
-                 bg="#0D47A1").pack(pady=(0, 20))
+                 bg="#0D47A1").pack(pady=(0, 8))
 
-        # ── Cuerpo blanco ─────────────────────────────────────
-        body = tk.Frame(self.win, bg="white",
-                        highlightthickness=0)
-        body.pack(fill="both", expand=True,
-                  padx=0, pady=0)
+        # Botón X rojo para cerrar
+        tk.Button(hdr, text="  ✕  Salir sin aceptar  ",
+                  command=self._reject,
+                  font=("Segoe UI", 9),
+                  bg="#C62828", fg="white",
+                  activebackground="#B71C1C",
+                  relief="flat", padx=10, pady=4,
+                  cursor="hand2").pack(pady=(0, 10))
+
+        # ── Cuerpo blanco usa grid para control preciso ────────
+        body = tk.Frame(self.win, bg="white", highlightthickness=0)
+        body.grid(row=1, column=0, sticky="nsew")
+        body.rowconfigure(1, weight=1)   # la caja de texto se expande
+        body.columnconfigure(0, weight=1)
 
         tk.Label(body,
                  text="Antes de empezar, lee y acepta las condiciones de uso:",
                  font=("Segoe UI", 10, "bold"),
-                 fg="#1565C0", bg="white").pack(
-                     anchor="w", padx=24, pady=(18, 6))
+                 fg="#1565C0", bg="white").grid(
+                     row=0, column=0, sticky="w",
+                     padx=24, pady=(14, 4))
 
-        # Caja de texto con scroll
+        # Caja de texto con scroll — fila 1, se expande
         frm = tk.Frame(body, bg="white")
-        frm.pack(fill="both", expand=True, padx=24, pady=(0, 8))
+        frm.grid(row=1, column=0, sticky="nsew", padx=24, pady=(0, 0))
+        frm.rowconfigure(0, weight=1)
+        frm.columnconfigure(0, weight=1)
 
         txt = tk.Text(frm, wrap="word",
                       font=("Segoe UI", 9),
@@ -1606,51 +1622,57 @@ class WelcomeDialog:
         txt.config(yscrollcommand=sb.set)
         txt.insert("1.0", self.TERMS_TEXT)
         txt.config(state="disabled")
-        sb.pack(side="right", fill="y")
-        txt.pack(side="left", fill="both", expand=True)
+        sb.grid(row=0, column=1, sticky="ns")
+        txt.grid(row=0, column=0, sticky="nsew")
 
-        # Checkbox aceptación
+        # Zona inferior FIJA — fila 2, altura fija
+        bottom = tk.Frame(body, bg="#EEF4FF",
+                          highlightthickness=1,
+                          highlightbackground="#BBCCE8")
+        bottom.grid(row=2, column=0, sticky="ew", padx=0, pady=0)
+
+        # Enlace legal
+        lnk = tk.Label(bottom,
+                        text="Leer condiciones completas en tapunto.app/tapunto-voz/legal.html",
+                        font=("Segoe UI", 8, "underline"),
+                        fg="#1565C0", bg="#EEF4FF", cursor="hand2")
+        lnk.pack(pady=(8, 2))
+        lnk.bind("<Button-1>", lambda e: self._open_legal())
+
+        # Checkbox — fuera del frame de scroll, siempre visible
         self._var = tk.BooleanVar(value=False)
         chk = tk.Checkbutton(
-            body,
-            text=("He leído y acepto las condiciones de uso "
-                  "y la política de privacidad."),
+            bottom,
+            text="He leído y acepto las condiciones de uso y la política de privacidad.",
             variable=self._var,
             font=("Segoe UI", 10),
-            bg="white", activebackground="white",
-            fg="#1A1A1A", cursor="hand2")
-        chk.pack(anchor="w", padx=24, pady=(4, 12))
+            bg="#EEF4FF", activebackground="#EEF4FF",
+            fg="#1A1A1A", cursor="hand2",
+            anchor="w")
+        chk.pack(fill="x", padx=24, pady=(4, 6))
 
-        # Botones
-        btn_frame = tk.Frame(body, bg="white")
-        btn_frame.pack(fill="x", padx=24, pady=(0, 20))
+        # Botones — siempre visibles en la parte inferior
+        btn_frame = tk.Frame(bottom, bg="#EEF4FF")
+        btn_frame.pack(fill="x", padx=24, pady=(0, 14))
 
         tk.Button(btn_frame, text="No acepto — salir",
                   command=self._reject,
                   font=("Segoe UI", 10),
-                  bg="#EEEEEE", fg="#555555",
+                  bg="#DDDDDD", fg="#555555",
                   relief="flat", padx=16, pady=8,
                   cursor="hand2").pack(side="left")
 
-        tk.Button(btn_frame, text="Acepto — continuar  ▶",
+        tk.Button(btn_frame, text="  Acepto — continuar  ▶  ",
                   command=self._accept,
-                  font=("Segoe UI", 10, "bold"),
+                  font=("Segoe UI", 11, "bold"),
                   bg="#1565C0", fg="white",
                   activebackground="#0D47A1",
-                  relief="flat", padx=20, pady=8,
+                  relief="flat", padx=20, pady=10,
                   cursor="hand2").pack(side="right")
-
-        # Enlace legal
-        lnk = tk.Label(body,
-                        text="Ver condiciones completas en tapunto.app/legal.html",
-                        font=("Segoe UI", 9, "underline"),
-                        fg="#1565C0", bg="white", cursor="hand2")
-        lnk.pack(pady=(0, 8))
-        lnk.bind("<Button-1>", lambda e: self._open_legal())
 
     def _open_legal(self):
         import webbrowser
-        webbrowser.open("https://tapunto.app/legal.html")
+        webbrowser.open("https://tapunto.app/tapunto-voz/legal.html")
 
     def _accept(self):
         if not self._var.get():
@@ -1781,71 +1803,98 @@ class TutorialDialog:
         self.win.title("tapunto-voz — Tutorial")
         sw = self.win.winfo_screenwidth()
         sh = self.win.winfo_screenheight()
-        w, h = 620, 520
+        w, h = 580, 480
         self.win.geometry(f"{w}x{h}+{(sw-w)//2}+{(sh-h)//2}")
-        self.win.resizable(False, False)
+        self.win.resizable(True, True)
         self.win.configure(bg="#0D47A1")
         self.win.protocol("WM_DELETE_WINDOW", self._close)
 
-        # Cabecera fija
+        # Layout con grid para control preciso de filas
+        self.win.rowconfigure(1, weight=1)
+        self.win.columnconfigure(0, weight=1)
+
+        # Cabecera fija — fila 0
         hdr = tk.Frame(self.win, bg="#0D47A1")
-        hdr.pack(fill="x")
+        hdr.grid(row=0, column=0, sticky="ew")
         tk.Label(hdr, text="tapunto-voz · Tutorial",
                  font=("Segoe UI", 13, "bold"),
-                 fg="white", bg="#0D47A1").pack(pady=(16, 0))
-
-        # Indicador de paso
+                 fg="white", bg="#0D47A1").pack(pady=(12, 0))
         self._lbl_paso = tk.Label(hdr, text="",
                                    font=("Segoe UI", 9),
                                    fg="#BBDEFB", bg="#0D47A1")
-        self._lbl_paso.pack(pady=(2, 12))
+        self._lbl_paso.pack(pady=(2, 4))
 
-        # Cuerpo blanco
+        # Botón X rojo para cerrar el tutorial
+        tk.Button(hdr, text="  ✕  Cerrar tutorial  ",
+                  command=self._close,
+                  font=("Segoe UI", 9),
+                  bg="#C62828", fg="white",
+                  activebackground="#B71C1C",
+                  relief="flat", padx=10, pady=4,
+                  cursor="hand2").pack(pady=(0, 8))
+
+        # Cuerpo blanco — fila 1, se expande
         body = tk.Frame(self.win, bg="white")
-        body.pack(fill="both", expand=True)
+        body.grid(row=1, column=0, sticky="nsew")
+        body.rowconfigure(1, weight=1)
+        body.columnconfigure(0, weight=1)
 
-        # Icono + título
+        # Icono + título — fila 0
         top = tk.Frame(body, bg="white")
-        top.pack(fill="x", padx=32, pady=(24, 0))
+        top.grid(row=0, column=0, sticky="ew", padx=24, pady=(16, 0))
 
-        self._lbl_icono = tk.Label(top, text="", font=("Segoe UI Emoji", 36),
+        self._lbl_icono = tk.Label(top, text="",
+                                    font=("Segoe UI Emoji", 30),
                                     bg="white")
-        self._lbl_icono.pack(side="left", padx=(0, 16))
+        self._lbl_icono.pack(side="left", padx=(0, 12))
 
         self._lbl_titulo = tk.Label(top, text="",
-                                     font=("Segoe UI", 16, "bold"),
+                                     font=("Segoe UI", 14, "bold"),
                                      fg="#1565C0", bg="white",
-                                     wraplength=480, justify="left")
+                                     wraplength=420, justify="left")
         self._lbl_titulo.pack(side="left", anchor="w")
 
-        # Texto del paso
+        # Texto del paso — fila 1, se expande
         self._lbl_texto = tk.Label(body, text="",
                                     font=("Segoe UI", 10),
                                     fg="#333333", bg="white",
-                                    wraplength=540, justify="left")
-        self._lbl_texto.pack(fill="both", expand=True,
-                              padx=32, pady=(16, 8))
+                                    wraplength=520, justify="left")
+        self._lbl_texto.grid(row=1, column=0, sticky="nsew",
+                              padx=24, pady=(10, 6))
 
-        # Barra de progreso visual
-        prog_frame = tk.Frame(body, bg="white")
-        prog_frame.pack(fill="x", padx=32, pady=(0, 4))
+        # Adaptar wraplength al redimensionar la ventana
+        def _on_resize(event):
+            new_wrap = max(300, event.width - 80)
+            self._lbl_texto.config(wraplength=new_wrap)
+            self._lbl_titulo.config(wraplength=max(200, new_wrap - 80))
+        self.win.bind("<Configure>", _on_resize)
+
+        # Zona inferior FIJA — fila 2
+        bottom = tk.Frame(body, bg="#EEF4FF",
+                           highlightthickness=1,
+                           highlightbackground="#BBCCE8")
+        bottom.grid(row=2, column=0, sticky="ew")
+
+        # Puntos de progreso
+        dots_frame = tk.Frame(bottom, bg="#EEF4FF")
+        dots_frame.pack(pady=(8, 4))
         self._dots = []
         for i in range(len(self.STEPS)):
-            d = tk.Label(prog_frame, text="●",
-                          font=("Segoe UI", 10),
-                          bg="white")
+            d = tk.Label(dots_frame, text="●",
+                          font=("Segoe UI", 9),
+                          bg="#EEF4FF")
             d.pack(side="left", padx=3)
             self._dots.append(d)
 
         # Botones navegación
-        btn_frame = tk.Frame(body, bg="white")
-        btn_frame.pack(fill="x", padx=32, pady=(4, 24))
+        btn_frame = tk.Frame(bottom, bg="#EEF4FF")
+        btn_frame.pack(fill="x", padx=20, pady=(4, 12))
 
         self._btn_prev = tk.Button(
             btn_frame, text="◀ Anterior",
             command=self._prev,
             font=("Segoe UI", 10),
-            bg="#EEEEEE", fg="#555555",
+            bg="#DDDDDD", fg="#555555",
             relief="flat", padx=14, pady=7,
             cursor="hand2")
         self._btn_prev.pack(side="left")
@@ -1889,11 +1938,13 @@ class TutorialDialog:
         if self._step > 0:
             self._step -= 1
             self._render()
+            self.win.update()
 
     def _next(self):
         if self._step < len(self.STEPS) - 1:
             self._step += 1
             self._render()
+            self.win.update()
         else:
             self._close()
 
