@@ -6,7 +6,7 @@ Si has descubierto una vulnerabilidad de seguridad en tapunto-voz, te agradecemo
 
 ### Cómo informar
 
-Envía un correo a: **seguridad@tapunto.app**
+Envía un correo a: **tapunto.soporte@gmail.com**
 
 Incluye, en la medida de lo posible:
 
