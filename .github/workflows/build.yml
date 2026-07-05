@@ -88,7 +88,108 @@ jobs:
 
             **Control del ordenador por voz para personas con movilidad reducida.**
 
-            Desarrollado por Enrique García Prats, Jorge García Prats y Alicia Prats Martínez.
+            Desarrollado por Enrique García Prats y Alicia Prats Martínez.
+
+            ### Instalación
+            1. Descarga `tapunto-voz.exe`
+            2. Doble clic — no requiere instalar nada
+            3. Micrófono conectado e internet activo
+
+            ### Advertencia de Windows
+            Haz clic en **"Más información"** → **"Ejecutar de todas formas"**
+
+            ### Condiciones de uso
+            [tapunto.app/legal.html](https://tapunto.app/legal.html)name: Construir tapunto-voz.exe
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Compilar en Windows
+    runs-on: windows-latest
+
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependencias y PyAudio
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+
+          # PyAudio con Visual C++ que ya incluye windows-latest
+          pip install pyaudio
+
+          # Resto de dependencias
+          pip install pyautogui SpeechRecognition keyboard pyperclip pywin32 pycaw comtypes pyinstaller
+
+      - name: Verificar PyAudio
+        run: python -c "import pyaudio; print('PyAudio OK')"
+
+      - name: Verificar sintaxis
+        run: python -c "import ast; ast.parse(open('supercapa.py','r',encoding='utf-8').read()); print('OK')"
+
+      - name: Generar tapunto-voz.exe
+        shell: pwsh
+        run: |
+          pyinstaller `
+            --onefile `
+            --noconsole `
+            --name "tapunto-voz" `
+            --hidden-import=speech_recognition `
+            --hidden-import=pyaudio `
+            --hidden-import=pyperclip `
+            --hidden-import=keyboard `
+            --hidden-import=win32gui `
+            --hidden-import=win32con `
+            --hidden-import=win32api `
+            --hidden-import=pycaw `
+            --hidden-import=comtypes `
+            --hidden-import=comtypes.client `
+            supercapa.py
+
+      - name: Calcular SHA-256
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash -Algorithm SHA256 dist\tapunto-voz.exe).Hash.ToLower()
+          Set-Content -Path "dist\tapunto-voz.exe.sha256" -Value "$hash  tapunto-voz.exe" -NoNewline
+          Write-Host "SHA-256: $hash"
+
+      - name: Subir artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: tapunto-voz-windows
+          path: |
+            dist/tapunto-voz.exe
+            dist/tapunto-voz.exe.sha256
+          retention-days: 30
+
+      - name: Publicar en GitHub Releases
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/tapunto-voz.exe
+            dist/tapunto-voz.exe.sha256
+          name: "tapunto-voz ${{ github.ref_name }}"
+          body: |
+            ## tapunto-voz ${{ github.ref_name }}
+
+            **Control del ordenador por voz para personas con movilidad reducida.**
+
+            Desarrollado por Enrique García Prats y Alicia Prats Martínez.
 
             ### Instalación
             1. Descarga `tapunto-voz.exe`
