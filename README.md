@@ -49,8 +49,8 @@ Diseñado especialmente para personas con **Esclerosis Lateral Amiotrófica (ELA
 
 Lee las [condiciones de uso y política de privacidad](https://tapunto.app/legal.html) antes de instalar el programa.
 
-- **Contacto general:** tapunto.soporte@gmail.com
-- **Privacidad:** tapunto.soporte@gmail.com
+- **Contacto general:** contacto@tapunto.app
+- **Privacidad:** privacidad@tapunto.app
 
 ## Compilar desde el código fuente
 
