@@ -43,15 +43,14 @@ Diseñado especialmente para personas con **Esclerosis Lateral Amiotrófica (ELA
 ## Desarrolladores
 
 - **Enrique García Prats**
-- **Jorge García Prats**
 - **Alicia Prats Martínez**
 
 ## Condiciones de uso y privacidad
 
 Lee las [condiciones de uso y política de privacidad](https://tapunto.app/legal.html) antes de instalar el programa.
 
-- **Contacto general:** contacto@tapunto.app
-- **Privacidad:** privacidad@tapunto.app
+- **Contacto general:** tapunto.soporte@gmail.com
+- **Privacidad:** tapunto.soporte@gmail.com
 
 ## Compilar desde el código fuente
 
