@@ -5,7 +5,7 @@ Control del ordenador por voz con rejilla superpuesta.
 
 Autores:
     Enrique García Prats
-    Alicia Prats Martínez
+        Alicia Prats Martínez
 
 NOVEDADES V5 - Accesibilidad para personas con movilidad reducida:
   * ALIAS DE VOZ PERSONALIZADOS: cada usuario puede grabar como EL/ELLA
@@ -1563,7 +1563,7 @@ class WelcomeDialog:
 
         "1. IDENTIFICACIÓN\n"
         "tapunto-voz es un programa gratuito y de código abierto "
-        "desarrollado por Enrique García Prats"
+        "desarrollado por Enrique García Prats "
         "y Alicia Prats Martínez (en adelante, «los desarrolladores»). "
         "Contacto: tapunto.soporte@gmail.com\n\n"
 
